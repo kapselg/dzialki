@@ -1,0 +1,43 @@
+name: EasyClaim
+version: '${project.version}'
+main: me.kapsel.easyclaim.EasyClaim
+api-version: 1.18
+authors: [ kapsel ]
+depend:
+  - WorldGuard
+description: Very simple claim plugin featuring flexible permissions and basic, WorldGuard based area protection.
+commands:
+  easyclaim:
+    description: Teleportuje do centrum działki lub ją tworzy
+    aliases:
+      - dzialka
+      - eclaim
+    usage: /<command>
+  easyclaim remove:
+    description: Usuwa działkę
+    usage: /<command>
+  easyclaim add:
+    description: Dodaje wybranego gracza do działki
+    usage: /<command> <nick_gracza>
+  easyclaim kick:
+    description: Wyrzuca wybranego gracza z działki
+    usage: /<command> <nick_gracza>
+  easyclaim members:
+    description: Wypisuje wszystkich członków działki
+
+permissions:
+  EasyClaim.create:
+    description: Allows claiming an area of default radius defined in config.yml
+  EasyClaim.remove:
+    description: Allows removing the area claim
+  EasyClaim.manageMembers:
+    description: Allows adding and removing members from claim
+  EasyClaim.VIP:
+    description: Allows claiming more area, range defined in config.yml
+  EasyClaim.reload:
+    description: Allows for usage of administrative tools
+  EasyClaim.*:
+    children:
+      EasyClaim.create: true
+      EasyClaim.remove: true
+      EasyClaim.manageMembers: true
