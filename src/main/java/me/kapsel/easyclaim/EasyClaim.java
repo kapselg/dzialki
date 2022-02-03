@@ -1,18 +1,13 @@
 package me.kapsel.easyclaim;
 
-import com.ibm.icu.impl.number.AffixPatternProvider;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
-
+//we will now objectify B)
 public final class EasyClaim extends JavaPlugin{
     public static StateFlag EASY_CLAIM;
     public static StateFlag EASY_CLAIM_ALLOW;
