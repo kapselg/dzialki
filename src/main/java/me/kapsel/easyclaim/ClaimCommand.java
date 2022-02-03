@@ -1,6 +1,5 @@
 package me.kapsel.easyclaim;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -59,7 +58,7 @@ public class ClaimCommand implements CommandExecutor {
                         break;
                     case("reload"):
                         if(p.hasPermission("EasyClaim.reload")){
-                            EasyClaim.plugin.reloadConfig();
+                            Main.plugin.reloadConfig();
                             Languages.configReloaded(p);
                         }else {
                             Languages.noPermission(p);
