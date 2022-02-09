@@ -2,6 +2,7 @@ package me.kapsel.easyclaim;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.domains.PlayerDomain;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -32,7 +33,7 @@ public class EasyClaim {
     );
     private Location loc;
     private int size;
-
+    private PlayerDomain members = new PlayerDomain();
     public EasyClaim(){
 
     }
@@ -113,5 +114,13 @@ public class EasyClaim {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public PlayerDomain getMembers() {
+        return members;
+    }
+
+    public void setMembers(PlayerDomain members) {
+        this.members = members;
     }
 }

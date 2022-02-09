@@ -6,6 +6,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.kapsel.easyclaim.dataFormats.ClaimInfo;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,9 +15,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class ClaimsContainer {
+public class ClaimsController {
     List<EasyClaim> claims;
-    public ClaimsContainer(){
+    public ClaimsController(){
         claims = new ArrayList<>();
     }
     public boolean register(EasyClaim claim){
@@ -54,19 +55,12 @@ public class ClaimsContainer {
                 }
             }
 
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.id", claim.getRegion().getId());
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.location.X", claim.getLoc().getX());
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.location.Y", claim.getLoc().getY());
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.location.Z", claim.getLoc().getZ());
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.location.yaw", claim.getLoc().getYaw());
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.location.world", Objects.requireNonNull(claim.getLoc().getWorld()).getName());
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.size", claim.getSize());
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.creation-date", new Date().toString());
-            ClaimData.get().set(claim.getP().getName() + "._easy-claim-1.members", new String[]{""});
+            ClaimInfo savedData = new ClaimInfo(claim.getSize(), new Date().toString(), claim.getLoc(),  claim.getMembers().getUniqueIds());
+
+            ClaimData.get().set(claim.getP().getName(), savedData);
             ClaimData.save();
 
             regions.addRegion(claim.getRegion());
-
             Languages.claimCreated(claim.getP());
             return true;
         }else{
