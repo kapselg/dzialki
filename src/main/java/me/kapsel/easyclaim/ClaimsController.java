@@ -69,6 +69,9 @@ public class ClaimsController {
     }
     public EasyClaim getClaim(Player p){
         ClaimInfo i = (ClaimInfo) ClaimData.get().get(p.getName(), ClaimInfo.class);
+        if(i.getRegionId() == null){
+            return null;
+        }
         return new EasyClaim(i.getSize(), i.getTpInfo().getLocation(), i.getRegionId());
     }
     public boolean delete(EasyClaim claim, boolean isConfirmed){

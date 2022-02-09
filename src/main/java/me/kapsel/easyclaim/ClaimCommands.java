@@ -26,20 +26,25 @@ public class ClaimCommands implements CommandExecutor {
                 //code for /eclaim
                 claimsController.register(new EasyClaim(p));
             }else{
+                EasyClaim ec = claimsController.getClaim(p);
                 switch (args[0]){
                     default:
                         //code for /eclaim claim
-                        claimsController.register(new EasyClaim(p));
+                        if(ec.teleport(p)){
+                            Languages.teleported(p);
+                        }else{
+                            p.performCommand("/easyclaim help");
+                        }
                         break;
                     case("remove"):
                     case("usun"):
                         //code for /eclaim remove
-                        RemoveClaim.RemoveClaim(p, false);
+                        claimsController.delete(claimsController.getClaim(p), false);
                         break;
                     case("add"):
                     case("dodaj"):
-                        //code for /eclaim add
-                        MembersClaim.AddMember(p, args[1]);
+                        ec.addPlayer(args[0]);
+                        claimsController.register(ec);
                         break;
                     case("kick"):
                     case("wyrzuc"):

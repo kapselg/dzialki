@@ -15,44 +15,7 @@ import java.util.List;
 public class MembersClaim extends JavaPlugin {
     public static void AddMember(Player p, String mname){
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(mname);
-        if(!offlinePlayer.isOnline()){
-            Languages.noSuchPlayer(p);
-            return;
-        }
-        if(mname.equalsIgnoreCase(p.getName())) {
-            Languages.memberIsOwner(p);
-            return;
-        }
-        ClaimData.reload();
-        Player m = Bukkit.getPlayer(mname);
-        if(!m.isOnline()) {
-            Languages.memberIsOffline(p);
-            return;
-        }
-        if(!ClaimData.get().isString(p.getName() + ".creation-date")) {
-            Languages.noClaim(p);
-            return;
-        }
-        //add member to data file
-        List<String> dataM = ClaimData.get().getStringList(p.getName() + ".members");
-        if(dataM.contains(mname)){
-            Languages.memberOnList(p);
-            return;
-        }
-        dataM.add(mname);
-        ClaimData.get().set(p.getName() + ".members", dataM);
 
-        //add member to region
-        RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(Bukkit.getWorld(ClaimData.get().getString(p.getName() + ".location.world"))));
-        ProtectedRegion region = regions.getRegion(p.getName() + "_easy-claim-1");
-
-        DefaultDomain regionM = region.getMembers();
-        regionM.addPlayer(m.getUniqueId());
-
-        region.setMembers(regionM);
-        ClaimData.save();
-        Languages.memberAdded(p);
-        Languages.youHaveBeenAdded(m, p);
     }
     public static void RemoveMember(Player p, String mname){
         if(mname.equalsIgnoreCase(p.getName())) {

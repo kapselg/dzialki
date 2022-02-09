@@ -18,9 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EasyClaim {
-
     private Player p;
     private ProtectedCuboidRegion region;
+    //TODO: un hard-code it!!
     private List<ItemStack> requiredItems = Arrays.asList(
             new ItemStack(Material.ENDER_PEARL, 4),
             new ItemStack(Material.DIAMOND, 16),
@@ -85,6 +85,35 @@ public class EasyClaim {
         //custom identification flag
         region.setFlag(Main.EASY_CLAIM, StateFlag.State.ALLOW);
     }
+    public boolean teleport(Player p){
+        return p.teleport(loc);
+    }
+    public Player getOwner(){
+        return Bukkit.getPlayer(this.region.getOwners().getUniqueIds().iterator().next());
+    }
+    public void addPlayer(Player member){
+        if(this.getOwner() == member) {
+            Languages.memberIsOwner(member);
+            return;
+        }
+        if(member.isOnline()) {
+            Languages.memberAdded(getOwner());
+            return;
+        }
+        this.region.getMembers().addPlayer(member.getUniqueId());
+        Languages.memberAdded(member);
+        Languages.youHaveBeenAdded(member, this.getOwner());
+    }
+    public boolean addPlayer(String memberName){
+        Player playerToBeAdded = Bukkit.getPlayer(memberName);
+        if(playerToBeAdded != null){
+            this.addPlayer(playerToBeAdded);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //region gettters setters
     public ProtectedRegion getRegion(){
         return region;
     }
@@ -123,5 +152,5 @@ public class EasyClaim {
     public void setSize(int size) {
         this.size = size;
     }
-
+    //endregion
 }
