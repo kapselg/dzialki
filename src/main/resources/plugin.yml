@@ -1,6 +1,6 @@
 name: EasyClaim
 version: '${project.version}'
-main: me.kapsel.easyclaim.EasyClaim
+main: me.kapsel.easyclaim.Main
 api-version: 1.18
 authors: [ kapsel ]
 depend:

@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-public class ClaimCommand implements CommandExecutor {
+public class ClaimCommands implements CommandExecutor {
     public static HashMap<Player, Confirmation> confirmations = new HashMap<>();
     //handle pending confirmations
     public static void addConfirmation(String command, Player p){
@@ -14,9 +14,9 @@ public class ClaimCommand implements CommandExecutor {
     }
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
         // /eclaim - tp
         if(command.getName().equalsIgnoreCase("easyclaim")){
+            ClaimsController claimsController = new ClaimsController();
             if(!(sender instanceof Player)) {
                 Languages.notPlayer(sender);
             }
@@ -24,12 +24,12 @@ public class ClaimCommand implements CommandExecutor {
             //code for /eclaim
             if(args.length == 0){
                 //code for /eclaim
-                CreateClaim.CreateClaim(p, false);
+                claimsController.register(new EasyClaim(p));
             }else{
                 switch (args[0]){
                     default:
                         //code for /eclaim claim
-                        CreateClaim.CreateClaim(p, true);
+                        claimsController.register(new EasyClaim(p));
                         break;
                     case("remove"):
                     case("usun"):

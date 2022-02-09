@@ -35,7 +35,7 @@ public final class Main extends JavaPlugin{
         getConfig().options().copyDefaults(true);
         saveConfig();
         ClaimData.setup();
-        this.getCommand("eclaim").setExecutor(new ClaimCommand());
+        this.getCommand("eclaim").setExecutor(new ClaimCommands());
         this.getCommand("eclaim").setTabCompleter(new TabCompletion());
     }
 

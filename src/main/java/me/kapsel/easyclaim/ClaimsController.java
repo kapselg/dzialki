@@ -4,22 +4,21 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.kapsel.easyclaim.dataFormats.ClaimInfo;
-import org.bukkit.Location;
+import me.kapsel.easyclaim.dataFormats.TpInfo;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ClaimsController {
     List<EasyClaim> claims;
-    public ClaimsController(){
-        claims = new ArrayList<>();
-    }
+
     public boolean register(EasyClaim claim){
         if(claim.getP().hasPermission("EasyClaim.create")){
             Inventory inv = claim.getP().getInventory();
@@ -55,7 +54,7 @@ public class ClaimsController {
                 }
             }
 
-            ClaimInfo savedData = new ClaimInfo(claim.getSize(), new Date().toString(), claim.getLoc(),  claim.getMembers().getUniqueIds());
+            ClaimInfo savedData = new ClaimInfo(claim.getSize(), new TpInfo(claim.getLoc()), claim.getRegion());
 
             ClaimData.get().set(claim.getP().getName(), savedData);
             ClaimData.save();
@@ -69,18 +68,8 @@ public class ClaimsController {
         }
     }
     public EasyClaim getClaim(Player p){
-        EasyClaim r = new EasyClaim();
-        r.setP(p);
-        RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
-        r.setRegion((ProtectedCuboidRegion) regions.getRegion(p.getName() + "_easy-claim-1"));
-        r.setSize(ClaimData.get().getInt(p.getName() + "._easy-claim-1.size"));
-        r.setLoc(new Location(
-                p.getWorld(),
-                ClaimData.get().getDouble(p.getName() + "._easy-claim-1.location.X"),
-                ClaimData.get().getDouble(p.getName() + "._easy-claim-1.location.Y"),
-                ClaimData.get().getDouble(p.getName() + "._easy-claim-1.location.Z")
-                ));
-        return r;
+        ClaimInfo i = (ClaimInfo) ClaimData.get().get(p.getName(), ClaimInfo.class);
+        return new EasyClaim(i.getSize(), i.getTpInfo().getLocation(), i.getRegionId());
     }
     public boolean delete(EasyClaim claim, boolean isConfirmed){
         //check if player has a claim
@@ -116,7 +105,7 @@ public class ClaimsController {
 
             }
         }else{
-            ClaimCommand.addConfirmation("remove", claim.getP());
+            ClaimCommands.addConfirmation("remove", claim.getP());
             Languages.aboutToRemove(claim.getP());
             Languages.confirm(claim.getP());
         }

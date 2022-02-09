@@ -1,44 +1,31 @@
 package me.kapsel.easyclaim.dataFormats;
 
-import com.sk89q.worldguard.domains.PlayerDomain;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import java.util.Set;
+import java.util.Date;
 import java.util.UUID;
 
 public class ClaimInfo {
-    private Player owner;
+    private String regionId;
     private int Size;
     private String date;
     private TpInfo tpInfo;
-    private UUID[] members;
 
-    public ClaimInfo(int size, String date, TpInfo tpInfo, UUID[] members) {
+    public ClaimInfo(int size, String date, TpInfo teleportInfo, String RegionID) {
         Size = size;
         this.date = date;
-        this.members = members;
-        this.tpInfo = tpInfo;
+        this.tpInfo = teleportInfo;
+        this.regionId = RegionID;
     }
 
-    public ClaimInfo(int size, String date, Location tpInfo, UUID [] members){
-        this(size, date, new TpInfo(tpInfo) , members);
+    public ClaimInfo(int size, String date, TpInfo teleportInfo, ProtectedRegion region) {
+        this(size, date, teleportInfo, region.getId());
     }
-
-    public  ClaimInfo(int size, String date, Location tpInfo, Set<UUID> members){
-        this(size, date, tpInfo, members.toArray(new UUID[0]));
+    public ClaimInfo(int size, TpInfo teleportInfo, ProtectedRegion regionID){
+        this(size, new Date().toString(), teleportInfo, regionID);
     }
     public ClaimInfo(){
 
-    }
-
-    public Player getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Player owner) {
-        this.owner = owner;
     }
 
     public int getSize() {
@@ -66,21 +53,14 @@ public class ClaimInfo {
     }
 
     public UUID[] getMembers() {
-        return members;
+        return null;
     }
 
-    public PlayerDomain getMemberDomain() {
-        PlayerDomain membersDomain = new PlayerDomain();
-        for(UUID member : members){
-            Player newMember = Bukkit.getPlayer(member);
-            if(newMember !=null){
-                membersDomain.addPlayer(newMember.getUniqueId());
-            }
-        }
-        return membersDomain;
+    public String getRegionId() {
+        return regionId;
     }
 
-    public void setMembers(UUID[] members) {
-        this.members = members;
+    public void setRegionId(String regionId) {
+        this.regionId = regionId;
     }
 }

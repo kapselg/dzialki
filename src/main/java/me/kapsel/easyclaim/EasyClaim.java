@@ -1,8 +1,9 @@
 package me.kapsel.easyclaim;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.domains.PlayerDomain;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -33,16 +34,24 @@ public class EasyClaim {
     );
     private Location loc;
     private int size;
-    private PlayerDomain members = new PlayerDomain();
     public EasyClaim(){
+
+    }
+    public EasyClaim(int size, Location location, String regionName){
+        ProtectedRegion region = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld())).getRegion(regionName);
+        if(region!=null){
+            this.region = (ProtectedCuboidRegion) region;
+            this.size = size;
+            this.loc = location;
+            this.p = Bukkit.getPlayer(region.getOwners().getPlayerDomain().getUniqueIds().iterator().next());
+        }else{
+            return;
+        }
 
     }
     //class constructor
     public EasyClaim(Player p){
-        this(p.getName());
-    }
-    public EasyClaim(String pl){
-        p  = Bukkit.getPlayer(pl);
+        this.p = p;
         if(p == null) return;
         if(p.hasPermission("EasyClaim.VIP")){
             size = (int) Main.plugin.getConfig().get("VIPSize") | 30;
@@ -79,7 +88,6 @@ public class EasyClaim {
     public ProtectedRegion getRegion(){
         return region;
     }
-
     public Player getP() {
         return p;
     }
@@ -116,11 +124,4 @@ public class EasyClaim {
         this.size = size;
     }
 
-    public PlayerDomain getMembers() {
-        return members;
-    }
-
-    public void setMembers(PlayerDomain members) {
-        this.members = members;
-    }
 }
