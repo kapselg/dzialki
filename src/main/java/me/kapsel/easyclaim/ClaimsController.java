@@ -18,9 +18,23 @@ import java.util.List;
 
 public class ClaimsController {
     List<EasyClaim> claims;
-
-    public boolean register(EasyClaim claim){
+    public void register(EasyClaim claim){
+        ClaimData.get().set(claim.getOwner().getName(), new ClaimInfo(claim.getSize(), new TpInfo(claim.getLoc()), claim.getRegion()));
+        ClaimData.save();
+    }
+    public void append(EasyClaim claim){
         if(claim.getP().hasPermission("EasyClaim.create")){
+
+            RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(claim.getP().getWorld()));
+
+            //checking if the flag does intersect with other claims
+            for (ProtectedRegion intersectingRegion : claim.getRegion().getIntersectingRegions(regions.getRegions().values())){
+                if(intersectingRegion.getFlag(Main.EASY_CLAIM) == StateFlag.State.ALLOW || intersectingRegion.getFlag(Main.EASY_CLAIM_ALLOW) == StateFlag.State.DENY){
+                    Languages.intersection(claim.getP());
+                    regions.removeRegion(claim.getRegion().getId());
+                    return;
+                }
+            }
             Inventory inv = claim.getP().getInventory();
             List<ItemStack> missing = new ArrayList<>();
             for(ItemStack item : claim.getRequiredItems()) {
@@ -36,24 +50,13 @@ public class ClaimsController {
             }
             if(!missing.isEmpty()){
                 Languages.noReqItems(claim.getP(), missing);
-                return false;
+                regions.removeRegion(claim.getRegion().getId());
+                return;
             }
             //remove required items from player's inventory
             for(ItemStack item: claim.getRequiredItems()){
                 inv.removeItem(item);
             }
-
-            RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(claim.getP().getWorld()));
-
-            //checking if the flag does intersect with other claims
-            for (ProtectedRegion intersectingRegion : claim.getRegion().getIntersectingRegions(regions.getRegions().values())){
-                if(intersectingRegion.getFlag(Main.EASY_CLAIM) == StateFlag.State.ALLOW || intersectingRegion.getFlag(Main.EASY_CLAIM_ALLOW) == StateFlag.State.DENY){
-                    Languages.intersection(claim.getP());
-                    regions.removeRegion(claim.getRegion().getId());
-                    return false;
-                }
-            }
-
             ClaimInfo savedData = new ClaimInfo(claim.getSize(), new TpInfo(claim.getLoc()), claim.getRegion());
 
             ClaimData.get().set(claim.getP().getName(), savedData);
@@ -61,24 +64,22 @@ public class ClaimsController {
 
             regions.addRegion(claim.getRegion());
             Languages.claimCreated(claim.getP());
-            return true;
         }else{
             Languages.noPermission(claim.getP());
-            return false;
         }
     }
     public EasyClaim getClaim(Player p){
-        ClaimInfo i = (ClaimInfo) ClaimData.get().get(p.getName(), ClaimInfo.class);
-        if(i.getRegionId() == null){
-            return null;
-        }
-        return new EasyClaim(i.getSize(), i.getTpInfo().getLocation(), i.getRegionId());
+        String i = ClaimData.get().getString(p.getName()+".regionId");
+        p.sendMessage(i);
+        //if(i!=null) return new EasyClaim(i.getSize(), i.getTpInfo().getLocation(), i.getRegionId());
+        return null;
     }
-    public boolean delete(EasyClaim claim, boolean isConfirmed){
+    public boolean delete(Player p, boolean isConfirmed){
         //check if player has a claim
         ClaimData.reload();
-        if(isConfirmed){
-            if(ClaimData.get().getString(claim.getP().getName()) != null){
+        ClaimInfo i = ClaimData.get().getObject(p.getName(), ClaimInfo.class);
+        EasyClaim claim = new EasyClaim(i.getSize(), i.getTpInfo().getLocation(), i.getRegionId());
+            if(isConfirmed){
                 //remove region
                 RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(claim.getP().getWorld()));
                 assert regions != null;
@@ -103,15 +104,11 @@ public class ClaimsController {
                 }
                 Languages.claimRemoved(claim.getP());
             }else{
-                //no claim
-                Languages.noClaimsToRemove(claim.getP());
-
+                ClaimCommands.addConfirmation("remove", p);
+                Languages.aboutToRemove(claim.getP());
+                Languages.confirm(claim.getP());
             }
-        }else{
-            ClaimCommands.addConfirmation("remove", claim.getP());
-            Languages.aboutToRemove(claim.getP());
-            Languages.confirm(claim.getP());
-        }
+
 
         return true;
     }

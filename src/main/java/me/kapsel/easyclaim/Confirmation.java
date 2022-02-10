@@ -13,7 +13,6 @@ public class Confirmation {
     }
     public boolean expired(){
         if(new Date().getTime() - date.getTime() > exp * 1000L) {
-
             return true;
         }else{
             return false;

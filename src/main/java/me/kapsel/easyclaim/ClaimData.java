@@ -1,11 +1,11 @@
 package me.kapsel.easyclaim;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class ClaimData {
 
@@ -15,7 +15,6 @@ public class ClaimData {
     //Finds or generates the custom config file
     public static void setup(){
         file = new File(Bukkit.getServer().getPluginManager().getPlugin("EasyClaim").getDataFolder(), "claimdata.yml");
-
         if (!file.exists()){
             try{
                 file.createNewFile();

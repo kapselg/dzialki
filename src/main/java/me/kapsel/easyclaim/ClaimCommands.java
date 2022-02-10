@@ -22,29 +22,39 @@ public class ClaimCommands implements CommandExecutor {
             }
             Player p = (Player) sender;
             //code for /eclaim
+            EasyClaim ec = claimsController.getClaim(p);
             if(args.length == 0){
                 //code for /eclaim
-                claimsController.register(new EasyClaim(p));
+                if(ec !=null){
+                    ec.teleport(p);
+                }else{
+                    ec = new EasyClaim(p);
+                    claimsController.append(ec);
+                    return true;
+                }
             }else{
-                EasyClaim ec = claimsController.getClaim(p);
+                if(ec==null){
+                    Languages.noClaim(p);
+                    return false;
+                }
                 switch (args[0]){
                     default:
                         //code for /eclaim claim
                         if(ec.teleport(p)){
                             Languages.teleported(p);
                         }else{
-                            p.performCommand("/easyclaim help");
+                            p.performCommand("help easyclaim");
                         }
                         break;
                     case("remove"):
                     case("usun"):
                         //code for /eclaim remove
-                        claimsController.delete(claimsController.getClaim(p), false);
+                        claimsController.delete(p, false);
                         break;
                     case("add"):
                     case("dodaj"):
-                        ec.addPlayer(args[0]);
-                        claimsController.register(ec);
+                        if(ec.addPlayer(args[0]))
+                            claimsController.register(ec);
                         break;
                     case("kick"):
                     case("wyrzuc"):
@@ -75,7 +85,7 @@ public class ClaimCommands implements CommandExecutor {
                             Languages.noConfirmations(sender);
                             return true;
                         }else{
-                            if(confirmations.get(p).command == "remove") RemoveClaim.RemoveClaim(p, true);
+                            if(confirmations.get(p).command.equalsIgnoreCase("remove")) claimsController.delete(p, true);
                         }
 
 

@@ -3,7 +3,10 @@ package me.kapsel.easyclaim;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import me.kapsel.easyclaim.dataFormats.ClaimInfo;
+import me.kapsel.easyclaim.dataFormats.TpInfo;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
@@ -16,6 +19,9 @@ public final class Main extends JavaPlugin{
 
     @Override
     public void onLoad() {
+        //link serializable classes
+        ConfigurationSerialization.registerClass(ClaimInfo.class, "ClaimInfo");
+        ConfigurationSerialization.registerClass(TpInfo.class, "TpInfo");
         //define flags for claims and claiming area
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
         StateFlag claimFlag = new StateFlag("easy-claim", false);

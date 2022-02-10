@@ -3,15 +3,22 @@ package me.kapsel.easyclaim.dataFormats;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-
-public class TpInfo {
+@SerializableAs("TpInfo")
+public class TpInfo implements ConfigurationSerializable {
     private double x;
     private double y;
     private double z;
     private float yaw;
     private String world;
+
+
 
     public TpInfo(double x, double y, double z, float yaw, String world) {
         this.x = x;
@@ -72,7 +79,32 @@ public class TpInfo {
         this.world = world;
     }
 
+    public double getZ() {
+        return z;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
+    }
+
     public Location getLocation(){
         return new Location(Bukkit.getWorld(world), this.x, this.y, this.z, this.yaw, 0);
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> serialize() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("x", this.getX());
+        result.put("y", this.getY());
+        result.put("z", this.getZ());
+        result.put("yaw", this.getYaw());
+        result.put("world", this.getWorld());
+        return result;
+    }
+
+    //deserialize()
+    public TpInfo(Map<String, Object> input){
+        this((double) input.get("x"), (double) input.get("y"), (double) input.get("z"), (float) input.get("yaw"), (String) input.get("world"));
     }
 }
