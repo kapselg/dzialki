@@ -68,7 +68,11 @@ public class ClaimCommands implements CommandExecutor {
                     case("czlonkowie"):
                     case("members"):
                         //code for /eclaim members
-                        MembersClaim.ShowMembers(p);
+                        if(ec.getMembers().size() > 0){
+                            Languages.playerList(p);
+                            ec.getMembers().forEach((member)-> p.sendMessage(member.getName()));
+                        }else Languages.noMembers(p);
+
                         break;
                     case("reload"):
                         if(p.hasPermission("EasyClaim.reload")){

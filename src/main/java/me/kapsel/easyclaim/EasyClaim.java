@@ -147,6 +147,10 @@ public class EasyClaim{
         }
     }
 
+    /**
+     * Gets list of claim's members
+     * @return claim's members list
+     */
     public List<Player> getMembers(){
         List<Player> result = new ArrayList<>();
         for(UUID playerId : this.getRegion().getMembers().getUniqueIds()) result.add(Bukkit.getPlayer(playerId));
