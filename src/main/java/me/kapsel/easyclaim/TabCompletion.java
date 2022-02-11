@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class TabCompletion implements TabCompleter {
-    List <String> commands = Arrays.asList("usun","dodaj","wyrzuc","czlonkowie","pomoc", "potwierdz", "reload");
+    List <String> commands = Arrays.asList("usun","dodaj","wyrzuc","czlonkowie", "potwierdz", "reload");
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
@@ -20,9 +20,7 @@ public class TabCompletion implements TabCompleter {
             case("dodaj"):
             case("add"):
                 List<String> onlinePlayers = new ArrayList<>();
-                Bukkit.getOnlinePlayers().forEach((player)->{
-                    onlinePlayers.add(p.getName());
-                });
+                Bukkit.getOnlinePlayers().forEach((player)-> onlinePlayers.add(p.getName()));
                 return onlinePlayers;
             case("kick"):
             case("wyrzuc"):

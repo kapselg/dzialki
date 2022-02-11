@@ -15,13 +15,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-public class EasyClaim {
-    private RegionManager manager;
+/**
+ * Represents and manages data of a claim.
+ * Can be sent to ClaimsController to be registered in plugin's data file.
+ */
+public class EasyClaim{
     private Player p;
     private ProtectedCuboidRegion region;
     //TODO: un hard-code it!!
@@ -41,18 +41,29 @@ public class EasyClaim {
     public EasyClaim(){
 
     }
+
+    /**
+     * Constructor to be used ONLY by ClaimsController to create instance for existing claims
+     * @param size Claim's size
+     * @param location Claim's teleport location
+     * @param regionName Claim's WorldGuard region name
+     */
     public EasyClaim(int size, Location location, String regionName){
-        RegionManager manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld()));
+        RegionManager manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(Objects.requireNonNull(location.getWorld())));
+        assert manager != null;
         ProtectedRegion region = manager.getRegion(regionName);
         if(region!=null){
             this.region = (ProtectedCuboidRegion) region;
             this.size = size;
             this.loc = location;
             this.p = Bukkit.getPlayer(region.getOwners().getPlayerDomain().getUniqueIds().iterator().next());
-            this.manager = manager;
         }
     }
-    //class constructor
+
+    /**
+     * Creates a new claim based on provided player's information
+     * @param p - Player standing in the middle of desired claim
+     */
     public EasyClaim(Player p){
         this.p = p;
         if(p.hasPermission("EasyClaim.VIP")){
@@ -84,6 +95,13 @@ public class EasyClaim {
         //custom identification flag
         region.setFlag(Main.EASY_CLAIM, StateFlag.State.ALLOW);
     }
+
+    /**
+     *
+     * Teports specified player to the claims stored TP location
+     * @param p Player to be teleported
+     * @return true or false depending on teleportation success
+     */
     public boolean teleport(Player p){
         Languages.teleported(p);
         return p.teleport(loc);
@@ -91,56 +109,92 @@ public class EasyClaim {
     public Player getOwner(){
         return Bukkit.getPlayer(this.region.getOwners().getUniqueIds().iterator().next());
     }
-    public void addPlayer(Player member){
-        if(this.getOwner() == member) {
+    public boolean addMember(Player member){
+        Player s = this.getOwner();
+        if(s == member) {
             Languages.memberIsOwner(member);
-            return;
+            return false;
         }
-        if(member.isOnline()) {
+        if(!member.isOnline()) {
             Languages.memberAdded(getOwner());
-            return;
+            return false;
         }
+        if(this.region.getMembers().contains(member.getUniqueId())) {
+            Languages.alreadyOnList(s);
+            return false;
+        }
+
         this.region.getMembers().addPlayer(member.getUniqueId());
 
-        Languages.memberAdded(member);
-        Languages.youHaveBeenAdded(member, this.getOwner());
+        Languages.memberAdded(s);
+        Languages.youHaveBeenAdded(member, s);
+        return true;
     }
-    public boolean addPlayer(String memberName){
-        Player playerToBeAdded = Bukkit.getPlayer(memberName);
+
+    /**
+     * Adds claim's member to the claim by their name
+     * @param member Player to be added
+     * @return true if player was added
+     */
+    public boolean addMember(String member){
+        Player playerToBeAdded = Main.plugin.getServer().getPlayer(member);
         if(playerToBeAdded != null){
-            this.addPlayer(playerToBeAdded);
-            return true;
+            return this.addMember(playerToBeAdded);
+
         }else{
             Languages.noSuchPlayer(p);
             return false;
         }
     }
+
     public List<Player> getMembers(){
         List<Player> result = new ArrayList<>();
         for(UUID playerId : this.getRegion().getMembers().getUniqueIds()) result.add(Bukkit.getPlayer(playerId));
         return result;
     }
-    public void removeMember(Player sender, Player member){
+
+    /**
+     * Removes claim's member from the claim
+     * @param member Player to be removed
+     * @return true if player was removed
+     */
+    public boolean removeMember(Player member){
+        Player s = this.getOwner();
         if(!this.getMembers().contains(member)){
-            Languages.noSuchPlayer(sender);
-            return;
+            Languages.noSuchPlayer(s);
+            return false;
         }
         if(!this.getMembers().isEmpty()){
-            Languages.noMembers(sender);
-            return;
+            Languages.noMembers(s);
+            return false;
         }
-        if(sender.getName().equals(member.getName())){
-            Languages.memberIsOwner(sender);
-            return;
+        if(s.getName().equals(member.getName())){
+            Languages.memberIsOwner(s);
+            return false;
         }
         if(!this.getMembers().contains(member)){
-            Languages.memberNotOnList(sender);
-            return;
+            Languages.memberNotOnList(s);
+            return false;
         }
         this.region.getMembers().removePlayer(member.getUniqueId());
         Languages.memberRemoved(p);
+        return true;
     }
 
+    /**
+     * Removes claim's member from claim by their name
+     * @param memberName Player to be removed
+     * @return true if player was removed
+     */
+    public boolean removeMember(String memberName){
+        Player playerToBeRemoved = Main.plugin.getServer().getPlayer(memberName);
+        if(playerToBeRemoved != null){
+            return this.removeMember(playerToBeRemoved);
+        }else{
+            Languages.noSuchPlayer(p);
+            return false;
+        }
+    }
     //region gettters setters
     public ProtectedRegion getRegion(){
         return region;

@@ -12,6 +12,10 @@ import java.util.UUID;
 //
 // deserializacja?
 //
+
+/**
+ * Serializable class format for storing data of a claim in data file.
+ */
 @SerializableAs("ClaimInfo")
 public class ClaimInfo implements ConfigurationSerializable {
     private String regionId;

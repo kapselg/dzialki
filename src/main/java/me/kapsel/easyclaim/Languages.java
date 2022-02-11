@@ -9,6 +9,10 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
+/**
+ * Provides messages for any actions made by the plugin.
+ * Will take string values from language files in the future.
+ */
 public class Languages {
     public static void notPlayer(CommandSender s){
         s.sendMessage(ChatColor.RED + "Komenda może być użyta tylko przez gracza!");
@@ -96,5 +100,8 @@ public class Languages {
         for(ItemStack item : missing){
             p.sendMessage(ChatColor.GRAY + "" + item.getAmount() + "x " + item.getType().name().replace("_", ""));
         }
+    }
+    public static void alreadyOnList(CommandSender s){
+        s.sendMessage(ChatColor.GOLD + "Gracz już znajduje się na liście członków działki");
     }
 }

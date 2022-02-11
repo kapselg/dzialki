@@ -11,23 +11,38 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Sends and gets claims data to and from the data file.
+ */
 public class ClaimsController {
     List<EasyClaim> claims;
+
+    /**
+     * Registers data for EXISTING claim
+     * @param claim claim data to be changed
+     */
     public void register(EasyClaim claim){
         ClaimData.get().set(claim.getOwner().getName(), new ClaimInfo(claim.getSize(), new TpInfo(claim.getLoc()), claim.getRegion()));
         ClaimData.save();
     }
+
+    /**
+     * Registers data for NEW claim
+     * @param claim claim data to be stored
+     */
     public void append(EasyClaim claim){
         if(claim.getP().hasPermission("EasyClaim.create")){
 
             RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(claim.getP().getWorld()));
 
             //checking if the flag does intersect with other claims
+            assert regions != null;
             for (ProtectedRegion intersectingRegion : claim.getRegion().getIntersectingRegions(regions.getRegions().values())){
                 if(intersectingRegion.getFlag(Main.EASY_CLAIM) == StateFlag.State.ALLOW || intersectingRegion.getFlag(Main.EASY_CLAIM_ALLOW) == StateFlag.State.DENY){
                     Languages.intersection(claim.getP());
@@ -68,16 +83,30 @@ public class ClaimsController {
             Languages.noPermission(claim.getP());
         }
     }
+
+    /**
+     * Gets an existing claim from data file by owner.
+     * Does not send any messages if player does not have a claim.
+     * @param p claim's owner
+     * @return EasyClaim instance if player has a claim, null if not
+     */
+    @Nullable
     public EasyClaim getClaim(Player p){
-        String i = ClaimData.get().getString(p.getName()+".regionId");
-        p.sendMessage(i);
-        //if(i!=null) return new EasyClaim(i.getSize(), i.getTpInfo().getLocation(), i.getRegionId());
+        ClaimInfo ci = ClaimData.get().getObject(p.getName(), ClaimInfo.class);
+        if(ci != null) return new EasyClaim(ci.getSize(), ci.getTpInfo().getLocation(), ci.getRegionId());
         return null;
     }
-    public boolean delete(Player p, boolean isConfirmed){
+
+    /**
+     * Removes claim data from data file.
+     * @param p owner of the claim
+     * @param isConfirmed status of the confirmation
+     */
+    public void delete(Player p, boolean isConfirmed){
         //check if player has a claim
         ClaimData.reload();
         ClaimInfo i = ClaimData.get().getObject(p.getName(), ClaimInfo.class);
+        assert i != null;
         EasyClaim claim = new EasyClaim(i.getSize(), i.getTpInfo().getLocation(), i.getRegionId());
             if(isConfirmed){
                 //remove region
@@ -108,8 +137,5 @@ public class ClaimsController {
                 Languages.aboutToRemove(claim.getP());
                 Languages.confirm(claim.getP());
             }
-
-
-        return true;
     }
 }

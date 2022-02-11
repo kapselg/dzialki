@@ -10,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+/**
+ * Serializable class format for storing data of a claim's teleportation target in data file.
+ */
 @SerializableAs("TpInfo")
 public class TpInfo implements ConfigurationSerializable {
     private double x;
@@ -98,13 +101,13 @@ public class TpInfo implements ConfigurationSerializable {
         result.put("x", this.getX());
         result.put("y", this.getY());
         result.put("z", this.getZ());
-        result.put("yaw", this.getYaw());
+        result.put("yaw", String.valueOf(this.getYaw()));
         result.put("world", this.getWorld());
         return result;
     }
 
     //deserialize()
     public TpInfo(Map<String, Object> input){
-        this((double) input.get("x"), (double) input.get("y"), (double) input.get("z"), (float) input.get("yaw"), (String) input.get("world"));
+        this((double) input.get("x"), (double) input.get("y"), (double) input.get("z"),  Float.parseFloat(input.get("yaw").toString()), (String) input.get("world"));
     }
 }

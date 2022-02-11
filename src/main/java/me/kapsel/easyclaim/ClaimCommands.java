@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 public class ClaimCommands implements CommandExecutor {
@@ -13,23 +14,26 @@ public class ClaimCommands implements CommandExecutor {
         confirmations.put(p, new Confirmation(command));
     }
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, @NotNull String label, String[] args) {
         // /eclaim - tp
         if(command.getName().equalsIgnoreCase("easyclaim")){
             ClaimsController claimsController = new ClaimsController();
+            Player p;
             if(!(sender instanceof Player)) {
                 Languages.notPlayer(sender);
+                return false;
+            }else{
+                p = (Player) sender;
             }
-            Player p = (Player) sender;
+
             //code for /eclaim
             EasyClaim ec = claimsController.getClaim(p);
             if(args.length == 0){
                 //code for /eclaim
-                if(ec !=null){
+                if(ec != null){
                     ec.teleport(p);
                 }else{
-                    ec = new EasyClaim(p);
-                    claimsController.append(ec);
+                    claimsController.append(new EasyClaim(p));
                     return true;
                 }
             }else{
@@ -53,23 +57,18 @@ public class ClaimCommands implements CommandExecutor {
                         break;
                     case("add"):
                     case("dodaj"):
-                        if(ec.addPlayer(args[0]))
+                        if(ec.addMember(args[1]))
                             claimsController.register(ec);
                         break;
                     case("kick"):
                     case("wyrzuc"):
                         //code for /eclaim kick
-                        MembersClaim.RemoveMember(p, args[1]);
+                        if(ec.removeMember(args[1])) claimsController.register(ec);
                         break;
                     case("czlonkowie"):
                     case("members"):
                         //code for /eclaim members
                         MembersClaim.ShowMembers(p);
-                        break;
-                    case("help"):
-                    case("pomoc"):
-                        //code for /eclaim help
-                        p.performCommand("help easyclaim");
                         break;
                     case("reload"):
                         if(p.hasPermission("EasyClaim.reload")){

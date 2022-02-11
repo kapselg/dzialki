@@ -2,7 +2,9 @@ package me.kapsel.easyclaim;
 
 import java.util.Date;
 
-
+/**
+ * Handles confirmation of error sensitive commands
+ */
 public class Confirmation {
     public Date date;
     public int exp = (int) Main.plugin.getConfig().get("ConfirmWaitTime");
@@ -12,10 +14,6 @@ public class Confirmation {
         this.command = command;
     }
     public boolean expired(){
-        if(new Date().getTime() - date.getTime() > exp * 1000L) {
-            return true;
-        }else{
-            return false;
-        }
+        return new Date().getTime() - date.getTime() > exp * 1000L;
     }
 }
